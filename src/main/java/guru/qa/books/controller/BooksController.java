@@ -3,6 +3,7 @@ package guru.qa.books.controller;
 import guru.qa.books.domain.Author;
 import guru.qa.books.domain.Book;
 import io.swagger.annotations.ApiOperation;
+import lombok.SneakyThrows;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -70,6 +71,7 @@ public class BooksController {
         return books;
     }
 
+    @SneakyThrows
     @GetMapping("/getBooksByTitle")
     @ApiOperation("Найти книгу по названию")
     public List<Book> getBooksByTitle(@RequestParam String title) {
@@ -81,3 +83,4 @@ public class BooksController {
         return result;
     }
 }
+
