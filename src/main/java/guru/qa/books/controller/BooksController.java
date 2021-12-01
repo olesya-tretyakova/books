@@ -3,12 +3,14 @@ package guru.qa.books.controller;
 import guru.qa.books.domain.Author;
 import guru.qa.books.domain.Book;
 import io.swagger.annotations.ApiOperation;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @RestController
 public class BooksController {
@@ -16,20 +18,66 @@ public class BooksController {
     Author author_2 = new Author("Alexander", "Pushkin");
     Author author_3 = new Author("Mikhail", "Lermontov");
     Author author_4 = new Author("William", "Shakespeare");
-    private Map<Integer, Book> books = Map.of(
-            1, Book.builder().id(1).author(author_1).name("Three comrades").build(),
-            2, Book.builder().id(2).author(author_2).name("Eugene Onegin").build(),
-            3, Book.builder().id(3).author(author_3).name("Borodino").build(),
-            4, Book.builder().id(4).author(author_4).name("Romeo and Juliet").build()
-    );
+    List<Author> authorList = Stream.of(author_1, author_2, author_3, author_4)
+            .collect(Collectors.toList());
 
-    List<Author> authors = new ArrayList<>();
-    
+    Map<Integer, Book> books = new HashMap<>() {
+        {
+            put(1, new Book("Three comrades", author_1, 1985));
+            put(2, new Book("Eugene Onegin", author_2, 2012));
+            put(3, new Book("Borodino", author_3, 1990));
+            put(4, new Book("Romeo and Juliet", author_4, 2000));
+        }
+    };
+
 
     @PostMapping("/addAuthor")
     @ApiOperation("Добавить автора")
-    public Integer addAuthor(Author author) {
+    public String addAuthor(@RequestBody Author author) {
+        authorList.add(author);
+        return "Add author with id = " + authorList.size();
+    }
 
-        return 2;
+    @PostMapping("/addBook")
+    @ApiOperation("Добавить книгу")
+    public String addBook(@RequestBody Book book) {
+        Integer bookKey = books.size() + 1;
+        books.put(bookKey, book);
+        return "Book was added";
+    }
+
+    @GetMapping("/getBooksByAuthor")
+    @ApiOperation("Получить список книг по автору")
+    public List<Book> getBooksByAuthor(@RequestParam String name, @RequestParam String surname) {
+        List<Book> result = new ArrayList<>();
+        books.forEach((integer, book) -> {
+            if (book.getAuthor().getName().equals((name)) &&
+                    book.getAuthor().getSurname().equals(surname))
+                result.add(book);
+        });
+        return result;
+    }
+
+    @GetMapping("/getAllAuthors")
+    @ApiOperation("Получить список авторов")
+    public List<Author> getAuthorList() {
+        return authorList;
+    }
+
+    @GetMapping("/getAllBooks")
+    @ApiOperation("Получить список книг")
+    public Map<Integer, Book> getAllBooks() {
+        return books;
+    }
+
+    @GetMapping("/getBooksByTitle")
+    @ApiOperation("Найти книгу по названию")
+    public List<Book> getBooksByTitle(@RequestParam String title) {
+        List<Book> result = new ArrayList<>();
+        books.forEach((integer, book) -> {
+            if (book.getTitle().equals((title)))
+                result.add(book);
+        });
+        return result;
     }
 }

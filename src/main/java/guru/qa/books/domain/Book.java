@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @JsonNaming(value = PropertyNamingStrategies.SnakeCaseStrategy.class)
 public class Book {
-    Integer id;
-    String name;
+    String title;
     Author author;
+    Integer issueYear;
 }
